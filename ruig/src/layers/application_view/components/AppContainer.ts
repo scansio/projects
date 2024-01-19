@@ -1,14 +1,10 @@
-// app-container.ts
+import BaseComponent from "./BaseComponent";
 
-class AppContainer extends HTMLElement {
+class AppContainer extends BaseComponent {
+  
   constructor() {
-    // Always call super first in constructor
     super();
-    this.attachShadow({mode: 'closed'})
-    console.log("root", this.shadowRoot)
   }
 }
 
-// Define the custom element
-customElements.define('app-container', AppContainer);
-export default AppContainer;
+export default BaseComponent.register(AppContainer);

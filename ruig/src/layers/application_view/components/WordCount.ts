@@ -1,5 +1,7 @@
+import BaseComponent from "./BaseComponent";
+
 // Create a class for the element
-class WordCount extends HTMLElement {
+class WordCount extends BaseComponent {
     constructor() {
       // Always call super first in constructor
       super();
@@ -35,6 +37,4 @@ class WordCount extends HTMLElement {
     }
   }
   
-  // Define the new element
-  customElements.define("word-count", WordCount);
-  export default WordCount;
+  export default BaseComponent.register(WordCount)
