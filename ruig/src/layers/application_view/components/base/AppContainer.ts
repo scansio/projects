@@ -34,7 +34,6 @@ class AppContainer extends BaseComponent {
 
   constructor() {
     super();
-    let i = 1
 
     appendChildren(this,
       this.menuBar,
@@ -52,11 +51,7 @@ class AppContainer extends BaseComponent {
       this.console,
       this.leftSideBar,
     )
-    this.getShadowWrapper().style.width = "100px"
-    this.getShadowWrapper().style.height = "100px";
-    this.getShadowWrapper().style.display = "table";
-    this.getShadowWrapper().style.background = "red";
-    this.getShadowWrapper().oncontextmenu = (e) => { e.preventDefault() };
+    
   }
 }
 
