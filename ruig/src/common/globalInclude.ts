@@ -1,1 +1,1 @@
-import '../layers/application_view/components/base/AppContainer';
+import '../layers/view/application/components/base/AppContainer';

@@ -1,11 +1,14 @@
 
 import reportWebVitals from './common/reportWebVitals';
 import './common/globalInclude';
-const appContainer = document.getElementById("appContainer");
+import AppContainer from './layers/view/application/components/base/AppContainer';
 
-if (appContainer) {
-  //appContainer.innerText = "<h1>Hello TypeScript!</h1>";
-}
+const appContainer = new AppContainer()
+
+appContainer.style.minWidth = process.env.REACT_APP_MIN_WIDTH as string ?? "1000px"
+appContainer.style.minHeight = process.env.REACT_APP_MIN_HEIGHT as string ?? "500px"
+
+document.body.appendChild(appContainer)
 
 /* if (module.hot) {
   module.hot.accept();
