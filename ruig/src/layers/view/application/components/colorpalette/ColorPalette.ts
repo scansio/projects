@@ -4,7 +4,6 @@ import BaseComponent from "../base/BaseComponent";
 class ColorPalette extends BaseComponent {
   constructor(style?: IAnyObject) {
     super({
-      background: 'blue',
       ...(style ?? {})
     });
   }

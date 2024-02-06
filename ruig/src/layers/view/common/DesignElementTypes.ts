@@ -1,5 +1,6 @@
 
 enum DesignElementTypes {
+    All,
     DIV = "div",
     IMG = "img",
     PARAGRAPH = "p",
@@ -11,6 +12,7 @@ enum DesignElementTypes {
     HEADING_6 = "h6",
     SVG = "svg",
     SPAN = "span",
+    LINK = "a",
 }
 
 export default DesignElementTypes

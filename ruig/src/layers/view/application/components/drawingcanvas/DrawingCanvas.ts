@@ -4,50 +4,28 @@ import NullException from "../../../../../common/exceptions/NullException";
 import IAnyObject from "../../../../../common/models/IAnyObject";
 import IPosition from "../../../../../common/models/IPosition";
 import { appendChildren, spreadTo } from "../../../../../common/utils";
-import DesignElementSelectionWrapper from "../../../design/DesignElementSelectionWrapper";
-import IDesignElement from "../../../design/models/IDesignElement";
+import ShadowMode from "../../common/ShadowMode";
 import BaseComponent from "../base/BaseComponent";
-import ContextMenu from "../contextmenu/ContextMenu";
 
 class DrawingCanvas extends BaseComponent {
-  designElementWrapper = new DesignElementSelectionWrapper()
-
-  contextMenu = new ContextMenu({
-    position: 'absolute',
-    bottom: '0',
-    display: 'flex',
-    borderRadius: '10px',
-    border: '0.5px solid gray',
-  })
 
   constructor(style?: IAnyObject) {
     super({
-      background: 'green',
-      ...(style ?? {})
-    });
+      ...(style ?? {}),
+      'z-index': '-9999'
+    }, ShadowMode.OPEN);
 
-    spreadTo(this.designElementWrapper.style, {
-      display: 'flex',
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      bottom: '0',
-      right: '0',
-      border: '1px solid blue',
-    })
-
-    SharedConfig.set(DRAWING_CANVAS, this)
-    SharedConfig.set(DESIGN_ELEMENT_WRAPPER, this.designElementWrapper)
-    SharedConfig.set(CONTEXT_MENU, this.contextMenu)
   }
 
-  addDesignElement(element: IDesignElement, position?: IPosition) {
+  /* connectedCallback() {
+  } */
+
+  addDesignElement(element: HTMLElement, position?: IPosition) {
     if (!element) {
       throw NullException
     }
 
-    let {x = 0, y = 0} = position as IPosition
-
+    let { x = 0, y = 0 } = position ?? { x: 0, y: 0 }
     spreadTo(element.style, {
       position: 'absolute',
       top: y,
@@ -58,6 +36,12 @@ class DrawingCanvas extends BaseComponent {
 
     return element
   }
+
+  /* onmouseover = (event: any) => {
+    this.focus()
+  }; */
 }
+
+export { DrawingCanvas as DC }
 
 export default BaseComponent.register(DrawingCanvas);

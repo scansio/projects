@@ -4,7 +4,6 @@ import BaseComponent from "../../base/BaseComponent";
 class LeftSideBar extends BaseComponent {
   constructor(style?: IAnyObject) {
     super({
-      background: 'green',
       ...(style ?? {})
     });
   }

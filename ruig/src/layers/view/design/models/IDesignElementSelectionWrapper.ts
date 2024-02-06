@@ -1,6 +1,7 @@
 import IDesignElement from "./IDesignElement"
 
-interface IDesignElementOnSelectWrapper extends HTMLElement {
+interface IDesignElementOnSelectWrapper {
+
     topRightElement: HTMLElement
     bottomRightElement: HTMLElement
     bottomLeftElement: HTMLElement

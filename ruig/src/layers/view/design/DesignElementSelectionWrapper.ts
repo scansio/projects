@@ -1,27 +1,37 @@
 import NullException from "../../../common/exceptions/NullException";
+import IAnyObject from "../../../common/models/IAnyObject";
 import { appendChildren } from "../../../common/utils";
 import BaseComponent from "../application/components/base/BaseComponent";
-import IDesignElement from "./models/IDesignElement";
-import IDesignElementSelectionWrapper from "./models/IDesignElementSelectionWrapper";
+import DesignElement from "./DesignElement";
 
-class DesignElementSelectionWrapper extends BaseComponent implements IDesignElementSelectionWrapper {
-    topRightElement = new HTMLElement
-    bottomRightElement = new HTMLElement
-    bottomLeftElement = new HTMLElement
-    topLeftElement = new HTMLElement
-    rotatorElement = new HTMLElement
-    resizerElement = new HTMLElement
-    topElement = new HTMLElement
-    leftElement = new HTMLElement
-    bottomElement = new HTMLElement
-    rightElement = new HTMLElement
+class DesignElementSelectionWrapper extends BaseComponent {
+    /* topRightElement = new BaseComponent
+    bottomRightElement = new BaseComponent
+    bottomLeftElement = new BaseComponent
+    topLeftElement = new BaseComponent
+    rotatorElement = new BaseComponent
+    resizerElement = new BaseComponent
+    topElement = new BaseComponent
+    leftElement = new BaseComponent
+    bottomElement = new BaseComponent
+    rightElement = new BaseComponent */
 
-    wrappedElement!: IDesignElement;
+    wrappedElement!: DesignElement;
 
-    constructor() {
-        super()
+    constructor(style?: IAnyObject) {
+        super({
+            background: 'transparent',
+            border: '0.5px solid red',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '110%',
+            height: '180%',
+            ...(style ?? {})
+        });
 
-        appendChildren(this,
+        /* appendChildren(this,
             this.topRightElement,
             this.bottomRightElement,
             this.bottomLeftElement,
@@ -32,10 +42,10 @@ class DesignElementSelectionWrapper extends BaseComponent implements IDesignElem
             this.leftElement,
             this.bottomElement,
             this.rightElement,
-        )
+        ) */
     }
 
-    setElementToWrap(element: IDesignElement): void {
+    setElementToWrap(element: DesignElement): void {
         if (!element) {
             throw new NullException
         }

@@ -9,17 +9,17 @@ export const enum StorageType {
   DESTROY_ALL,
 }
 
+
 class GlobalConfig {
+  protected static _instance: GlobalConfig
 
-  static _instance: GlobalConfig
-
-  dynamicConfig!: IAnyObject
-  __get!: (key: any, where: any) => any
-  __set!: (key: any, value: any, where: any) => void
-  __remove!: (key: any, where: any) => any
-  __destroy!: (where: any) => void
-  __removeFrom!: (fromKey: any, valueToRemove: null | undefined, where: any) => any
-  __has!: (key: any, where: any) => boolean
+  private dynamicConfig!: IAnyObject
+  private __get!: (key: any, where: any) => any
+  private __set!: (key: any, value: any, where: any) => void
+  private __remove!: (key: any, where: any) => any
+  private __destroy!: (where: any) => void
+  private __removeFrom!: (fromKey: any, valueToRemove: null | undefined, where: any) => any
+  private __has!: (key: any, where: any) => boolean
 
   constructor() {
     if (!GlobalConfig._instance) {
@@ -38,24 +38,17 @@ class GlobalConfig {
         switch (where) {
           case StorageType.LOCAL_STORAGE:
             value = localStorage.getItem(key)
+            value = GlobalConfig.parse(value)
             break
 
           case StorageType.SESSION_STORAGE:
             value = sessionStorage.getItem(key)
+            value = GlobalConfig.parse(value)
             break
 
           default:
             value = this.dynamicConfig[key]
             break
-        }
-
-        if (value) {
-          try {
-            value = atob(value)
-          } catch (_err) { }
-          try {
-            value = JSON.parse(value)
-          } catch (error) { }
         }
 
         return value
@@ -66,22 +59,14 @@ class GlobalConfig {
           key = btoa(key)
         } catch (_err) { }
 
-        try {
-          if (value instanceof Object) {
-            value = JSON.stringify(value)
-          }
-        } catch (_err) { }
-
-        try {
-          value = btoa(value)
-        } catch (_err) { }
-
         switch (where) {
           case StorageType.LOCAL_STORAGE:
+            value = GlobalConfig.stringify(value)
             localStorage.setItem(key, value)
             break
 
           case StorageType.SESSION_STORAGE:
+            value = GlobalConfig.stringify(value)
             sessionStorage.setItem(key, value)
             break
 
@@ -123,26 +108,26 @@ class GlobalConfig {
           copiedKey = btoa(copiedKey)
         } catch (_err) { }
 
-        let v
+        let value
 
         switch (where) {
           case StorageType.LOCAL_STORAGE:
-            v = this.__get(key, StorageType.LOCAL_STORAGE)
-            if (v) localStorage.removeItem(copiedKey)
+            value = this.__get(key, StorageType.LOCAL_STORAGE)
+            if (value) localStorage.removeItem(copiedKey)
             break
 
           case StorageType.SESSION_STORAGE:
-            v = this.__get(key, StorageType.SESSION_STORAGE)
-            if (v) sessionStorage.removeItem(copiedKey)
+            value = this.__get(key, StorageType.SESSION_STORAGE)
+            if (value) sessionStorage.removeItem(copiedKey)
             break
 
           default:
-            v = this.__get(key, StorageType.MEMORY_STORAGE)
-            if (v) delete this.dynamicConfig[copiedKey]
+            value = this.__get(key, StorageType.MEMORY_STORAGE)
+            if (value) delete this.dynamicConfig[copiedKey]
             break
         }
 
-        return v
+        return value
       }
 
       this.__destroy = (where: StorageType) => {
@@ -167,7 +152,7 @@ class GlobalConfig {
         }
       }
 
-      this.__removeFrom = (fromKey, valueToRemove = null, where: StorageType) => {
+      this.__removeFrom = (fromKey, valueToRemove = null, where: StorageType = StorageType.MEMORY_STORAGE) => {
         const exist = this.__get(fromKey, where)
         if (!exist) return false
         if (exist instanceof Array) {
@@ -175,10 +160,13 @@ class GlobalConfig {
           if (!valueToRemove) {
             deleted = exist.pop()
           } else {
-            deleted = exist[exist.indexOf(valueToRemove)]
+            let [deleted_temp] = [...exist[exist.indexOf(valueToRemove)]]
             delete exist[exist.indexOf(valueToRemove)]
+            deleted = deleted_temp
           }
-          this.__set(fromKey, exist, where)
+          if (deleted) {
+            this.__set(fromKey, exist, where)
+          }
           return deleted
         }
         return false
@@ -204,11 +192,11 @@ class GlobalConfig {
     if (!Object.hasOwnProperty.call(this.dynamicConfig, parentKey)) {
       this.dynamicConfig[parentKey] = []
     }
-    if (this.dynamicConfig[parentKey] instanceof Array) {
+    if (!(this.dynamicConfig[parentKey] instanceof Array)) {
       this.dynamicConfig[parentKey] = [this.dynamicConfig[parentKey]]
     }
     this.dynamicConfig[parentKey].push(valueToAdd)
-    return true
+    return this.dynamicConfig[parentKey]
   }
 
   addToFlashData(parentKey: string, valueToAdd: any) {
@@ -223,7 +211,7 @@ class GlobalConfig {
     }
     exist.push(valueToAdd)
     this.__set(parentKey, exist, StorageType.LOCAL_STORAGE)
-    return true
+    return exist
   }
 
   addToSessionData(parentKey: string, valueToAdd: any) {
@@ -234,7 +222,7 @@ class GlobalConfig {
     }
     exist.push(valueToAdd)
     this.__set(parentKey, exist, StorageType.SESSION_STORAGE)
-    return true
+    return exist
   }
 
   removeFrom(parentKey: string, valueToRemove = null) {
@@ -325,37 +313,61 @@ class GlobalConfig {
     this.__destroy(StorageType.DESTROY_ALL)
   }
 
-  increment(key: string, returnValue = true, throwIfNotfound = false) {
+  increment(key: string, throwIfNotfound = false) {
     if (Object.hasOwnProperty.call(this.dynamicConfig, key)) {
-      if (typeof this.dynamicConfig[key] === 'number') {
+      if (typeof Number.parseInt(this.dynamicConfig[key]) === 'number') {
         ++this.dynamicConfig[key]
-        if (returnValue) {
-          return this.dynamicConfig[key]
-        }
+        return this.dynamicConfig[key]
       } else {
         throw new Error("Specified key is not a number can't increment")
       }
     } else {
       if (throwIfNotfound) throw new Error('Key not found')
-      if (returnValue) return (this.dynamicConfig[key] = 1)
     }
+    return (this.dynamicConfig[key] = 1)
   }
 
-  decrement(key: string, returnValue = true, throwIfNotfound = false) {
+  decrement(key: string, throwIfNotfound = false) {
     if (Object.hasOwnProperty.call(this.dynamicConfig, key)) {
-      if (typeof this.dynamicConfig[key] === 'number') {
+      if (typeof Number.parseInt(this.dynamicConfig[key]) === 'number') {
         --this.dynamicConfig[key]
-        if (returnValue) {
-          return this.dynamicConfig[key]
-        }
+        return this.dynamicConfig[key]
       } else {
         throw new Error("Specified key is not a number can't decrement")
       }
     } else {
       if (throwIfNotfound) throw new Error('Key not found')
-      // if (returnValue) return (this.dynamicConfig[key] = 0);
     }
+    return (this.dynamicConfig[key] = -1);
   }
+
+
+  static parse = (value: any) => {
+    if (value) {
+      try {
+        value = atob(value)
+      } catch (_err) { }
+      try {
+        value = JSON.parse(value)
+      } catch (error) { }
+    }
+    return value
+  }
+
+  static stringify = (value: any) => {
+    try {
+      if (value instanceof Object) {
+        value = JSON.stringify(value)
+      }
+    } catch (_err) { }
+
+    try {
+      value = btoa(value)
+    } catch (_err) { }
+
+    return value
+  }
+
 }
 
 const SharedConfig = new GlobalConfig()

@@ -1,8 +1,15 @@
-import IDesignElement from "../../design/models/IDesignElement";
+import DesignElementTypes from "../../common/DesignElementTypes";
+import DesignElement from "../../design/DesignElement";
+
+export type IActionInit = {svgPathData: string, hint: string, description: string}
 
 interface IAction {
-    supportedDesignElements: string[];
-    action(designElement: IDesignElement): void;
+    supportedDesignElements: DesignElementTypes | DesignElementTypes[];
+    svgPathData: string;
+    hint: string;
+    description: string;
+    init(init: IActionInit): void;
+    action: (designElement: DesignElement) => void;
     enable(): void;
     disable(): void;
     subscribe(): void;

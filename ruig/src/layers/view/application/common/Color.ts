@@ -4,7 +4,8 @@ enum Color {
     green = 'green',
     blue = 'blue',
     ash = '#d7d7d7',
-    lightAsh = '#f7f7f8e0',
+    lightAsh = '#fbfbfb',
+    lightBlue = '#e5e5ffde',
 }
 
 export default Color

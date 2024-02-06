@@ -1,20 +1,18 @@
-import NullException from "../../../../../common/exceptions/NullException"
-import IAnyObject from "../../../../../common/models/IAnyObject"
-import IPair from "../../../../../common/models/IPair"
-import { cssString, snakeCase } from "../../../../../common/utils"
-import Color from "../../common/Color"
-import ShadowMode from "../../common/ShadowMode"
-import InvalidTagNameException from "../exceptions/InvalidTagNameException"
-import IDelegateModel from "./IDelegateModel"
+/* import NullException from "../../../../common/exceptions/NullException"
+import IAnyObject from "../../../../common/models/IAnyObject"
+import IPair from "../../../../common/models/IPair"
+import { cssString, snakeCase } from "../../../../common/utils"
+import Color from "../../application/common/Color"
+import ShadowMode from "../../application/common/ShadowMode"
+import IDelegateModel from "../../application/components/base/IDelegateModel"
+import InvalidTagNameException from "../../application/components/exceptions/InvalidTagNameException"
 
-class BaseComponent extends HTMLElement implements IDelegateModel {
-  protected shadow: ShadowRoot
-  protected shadowWrapper: HTMLElement
+
+class BaseDesignComponent extends HTMLElement implements IDelegateModel {
   protected shadowStyle: HTMLStyleElement
 
   constructor(style?: IAnyObject, mode?: ShadowMode) {
     super()
-    this.shadow = this.attachShadow({ mode: mode ?? ShadowMode.CLOSE })
     this.shadowWrapper = document.createElement('div')
     this.shadowStyle = document.createElement('style')
     this.shadowWrapper.id = `${this.tagName?.toLowerCase()}`
@@ -350,10 +348,10 @@ class BaseComponent extends HTMLElement implements IDelegateModel {
     return this.shadowWrapper
   }
 
-  /* addStylesheets(...paths: string[]) {
+  addStylesheets(...paths: string[]) {
     this.addStyle(...paths)
     throw new Error("Not implemented")
-  } */
+  }
 
   addStyle(...styles: string[]) {
     if (!styles) {
@@ -384,7 +382,7 @@ class BaseComponent extends HTMLElement implements IDelegateModel {
     return this.shadowWrapper.classList.replace(oldClassName, newClassName)
   }
 
-  public static register(element: typeof BaseComponent | typeof HTMLElement): typeof BaseComponent | typeof HTMLElement {
+  public static register(element: typeof BaseDesignComponent | typeof HTMLElement): typeof BaseDesignComponent | typeof HTMLElement {
     if (!element) {
       throw new InvalidTagNameException()
     }
@@ -398,4 +396,6 @@ class BaseComponent extends HTMLElement implements IDelegateModel {
   }
 }
 
-export default BaseComponent
+export default BaseDesignComponent
+ */
+export {}

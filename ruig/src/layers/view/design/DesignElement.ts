@@ -1,4 +1,3 @@
-import { wrap } from "module";
 import SharedConfig from "../../../common/SharedConfig";
 import { ACTIVE_ELEMENT, CLIPBOARD, CONTEXT_MENU, DESIGN_ELEMENT_WRAPPER, EVENT_DATA, EVENT_DESELECT, EVENT_SELECT } from "../../../common/constants";
 import NullException from "../../../common/exceptions/NullException";
@@ -14,13 +13,14 @@ export interface DESIGN_ELEMENT_EVENT_DATA_TYPE { [EVENT_DATA]: IDesignElement }
 abstract class DesignElement extends BaseComponent implements IDesignElement {
 
     abstract type: DesignElementTypes;
-    protected abstract inToolElement: HTMLElement;
+    protected extendedElement!: HTMLElement;
 
     lock = false;
     private _deselectEvent
     private _selectEvent
 
     position: IPosition = { x: 0, y: 0 };
+    zIndex: number;
 
     constructor(style?: IAnyObject) {
         super({
@@ -29,6 +29,11 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
         this.draggable = true;
         this._deselectEvent = new CustomEvent<DESIGN_ELEMENT_EVENT_DATA_TYPE>(EVENT_DESELECT, { detail: { [EVENT_DATA]: this } })
         this._selectEvent = new CustomEvent<DESIGN_ELEMENT_EVENT_DATA_TYPE>(EVENT_SELECT, { detail: { [EVENT_DATA]: this } })
+        this.initExtendedElement()
+    }
+
+    initExtendedElement() {
+        this.extendedElement = document.createElement(`${this.type}`);
     }
 
     deselectEvent(): void {
@@ -45,7 +50,7 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
         if (!wrapper) {
             throw new NullException("Design element wrapper not found")
         }
-
+        wrapper.style.zIndex = this.zIndex + 1
         wrapper.setElementToWrap(this)
         appendChildren(this, wrapper)
     }
@@ -56,7 +61,7 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
 
     private _isSelected: boolean = false;
 
-    set isSelected(value: boolean) {
+    set isSelected(_value: boolean) {
         return;
     }
 
@@ -65,6 +70,9 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
     }
 
     deselect() {
+        if (!this._isSelected) {
+            return;
+        }
         SharedConfig.remove(ACTIVE_ELEMENT)
         this._isSelected = false;
         this.detachWrapper()
@@ -72,6 +80,8 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
     }
 
     select() {
+        let activeElement = SharedConfig.get(ACTIVE_ELEMENT)
+        activeElement?.deselect()
         SharedConfig.set(ACTIVE_ELEMENT, this)
         this._isSelected = true;
         this.attachWrapper()
@@ -87,7 +97,7 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
         this.onclick()
     }
 
-    oncontextmenu: ((this: GlobalEventHandlers, ev: MouseEvent) => any) | null = (ev: MouseEvent) => {
+    oncontextmenu = (ev: MouseEvent) => {
         this.showPopover()
         return true;
     }
@@ -103,7 +113,7 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
             throw new NullException("Context Menu element not found")
         }
 
-        appendChildren(this, contextMenu)
+        appendChildren(this as BaseComponent, contextMenu)
         contextMenu.focus()
         contextMenu.onblur = (e) => {
             e?.preventDefault()
@@ -111,27 +121,36 @@ abstract class DesignElement extends BaseComponent implements IDesignElement {
         }
     }
 
-    oncopy: ((this: GlobalEventHandlers, ev: ClipboardEvent) => any) | null = (ev) => {
+    oncopy = (ev: any) => {
         ev?.preventDefault()
         SharedConfig.set(CLIPBOARD, this)
     }
 
-    oncut: ((this: GlobalEventHandlers, ev: ClipboardEvent) => any) | null = (ev) => {
+    oncut = (ev: any) => {
         ev?.preventDefault()
-        SharedConfig.set(CLIPBOARD, this)
+        SharedConfig.set(CLIPBOARD, {this}.this)
         this.parentElement?.removeChild(this)
     };
 
-    onpaste: ((this: GlobalEventHandlers, ev: ClipboardEvent) => any) | null = (ev) => {
+    onpaste = (ev: any) => {
         ev?.preventDefault()
-        const copiedDesignElement: IDesignElement = SharedConfig.get(CLIPBOARD)
+        const copiedDesignElement: DesignElement = SharedConfig.get(CLIPBOARD)
         if (copiedDesignElement && (this.type == DesignElementTypes.DIV || this.type == DesignElementTypes.SPAN)) {
-            appendChildren(this, copiedDesignElement)
+            appendChildren(this as BaseComponent, copiedDesignElement)
         }
 
     };
 
     autofocus: boolean = false;
+
+    set index(index: number) {
+        this.zIndex = index
+        this.style.zIndex = `${index}`
+    }
+
+    get index() {
+        return this.zIndex
+    }
 }
 
 export default DesignElement

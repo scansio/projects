@@ -8,7 +8,15 @@
 /* 		"ghcr.io/devcontainers-contrib/features/micro:1": {},
 		"ghcr.io/akhildevelops/devcontainer-features/pip:0": {},
 		"ghcr.io/devcontainers-community/npm-features/prettier:1": {}
- */	}
+ */
+},
+"customizations": {
+"vscode": {
+	"extensions": [
+		"ms-vscode.vscode-typescript-next"
+	]
+}
+}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

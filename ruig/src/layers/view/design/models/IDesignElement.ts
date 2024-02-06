@@ -1,6 +1,6 @@
 import DesignElementTypes from "../../common/DesignElementTypes";
 
-interface IDesignElement extends HTMLElement{
+interface IDesignElement {
     type: DesignElementTypes;
     isSelected: boolean;
     attachWrapper(): void;

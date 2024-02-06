@@ -19,6 +19,7 @@ interface IDelegateModel {
     style: CSSStyleDeclaration;
     tabIndex: number;
     title: string;
+    disabled: boolean;
 
     // Methods
     addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;

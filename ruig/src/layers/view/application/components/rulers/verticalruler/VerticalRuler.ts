@@ -4,7 +4,6 @@ import BaseComponent from "../../base/BaseComponent";
 class VerticalRuler extends BaseComponent {
   constructor(style?: IAnyObject) {
     super({
-      background: 'pink',
       ...(style ?? {})
     });
   }
